@@ -1,0 +1,435 @@
+```dot
+digraph DataFlowDiagram {
+    rankdir=LR;
+
+    // External Entities
+    User [shape=box, label="User"];
+    AndroidOS [shape=box, label="Android OS"];
+
+    // Trust Boundary for Android OS
+    subgraph cluster_android {
+        label="Android OS"
+        style=dashed;
+
+        BluetoothAdapter [shape=cylinder, label="Bluetooth Adapter"];
+        BluetoothDevice [shape=box, label="Bluetooth Device"];
+        BluetoothSocket [shape=cylinder, label="Bluetooth Socket"];
+        WifiManager [shape=cylinder, label="Wifi Manager"];
+        Network [shape=cylinder, label="Network"];
+        DatagramSocket [shape=cylinder, label="Datagram Socket"];
+        ServerSocket [shape=cylinder, label="Server Socket"];
+        SSLSocket [shape=cylinder, label="SSL Socket"];
+        ContentResolver [shape=cylinder, label="Content Resolver"];
+        NotificationManager [shape=cylinder, label="Notification Manager"];
+        ClipboardManager [shape=cylinder, label="Clipboard Manager"];
+        TelephonyManager [shape=cylinder, label="Telephony Manager"];
+        InputMethodManager [shape=cylinder, label="Input Method Manager"];
+        MediaSessionManager [shape=cylinder, label="Media Session Manager"];
+        StorageManager [shape=cylinder, label="Storage Manager"];
+        PackageManager [shape=cylinder, label="Package Manager"];
+    }
+
+    // Android Application
+    subgraph cluster_app {
+        label="Android Application"
+        style=dashed;
+
+        // Core Application Components
+        KdeConnect [shape=ellipse, label="KdeConnect", mapping="KdeConnect.kt"];
+        BackgroundService [shape=ellipse, label="Background Service", mapping="BackgroundService.kt"];
+        KdeConnectBroadcastReceiver [shape=ellipse, label="KdeConnect Broadcast Receiver", mapping="KdeConnectBroadcastReceiver.kt"];
+        MainActivity [shape=ellipse, label="Main Activity", mapping="UserInterface/MainActivity.kt"];
+        PairingFragment [shape=ellipse, label="Pairing Fragment", mapping="UserInterface/PairingFragment.kt"];
+        DeviceFragment [shape=ellipse, label="Device Fragment", mapping="UserInterface/DeviceFragment.kt"];
+        SettingsFragment [shape=ellipse, label="Settings Fragment", mapping="UserInterface/SettingsFragment.kt"];
+        CustomDevicesActivity [shape=ellipse, label="Custom Devices Activity", mapping="UserInterface/CustomDevicesActivity.java"];
+        TrustedNetworksActivity [shape=ellipse, label="Trusted Networks Activity", mapping="UserInterface/TrustedNetworksActivity.kt"];
+        PluginSettingsActivity [shape=ellipse, label="Plugin Settings Activity", mapping="UserInterface/PluginSettingsActivity.java"];
+        PluginSettingsListFragment [shape=ellipse, label="Plugin Settings List Fragment", mapping="UserInterface/PluginSettingsListFragment.java"];
+
+        // Backends
+        BluetoothLinkProvider [shape=ellipse, label="Bluetooth Link Provider", mapping="Backends/BluetoothBackend/BluetoothLinkProvider.kt"];
+        BluetoothLink [shape=ellipse, label="Bluetooth Link", mapping="Backends/BluetoothBackend/BluetoothLink.kt"];
+        ConnectionMultiplexer [shape=ellipse, label="Connection Multiplexer", mapping="Backends/BluetoothBackend/ConnectionMultiplexer.kt"];
+        LanLinkProvider [shape=ellipse, label="LAN Link Provider", mapping="Backends/LanBackend/LanLinkProvider.java"];
+        LanLink [shape=ellipse, label="LAN Link", mapping="Backends/LanBackend/LanLink.java"];
+        MdnsDiscovery [shape=ellipse, label="mDNS Discovery", mapping="Backends/LanBackend/MdnsDiscovery.java"];
+        NsdResolveQueue [shape=ellipse, label="NSD Resolve Queue", mapping="Backends/LanBackend/NsdResolveQueue.kt"];
+        LoopbackLinkProvider [shape=ellipse, label="Loopback Link Provider", mapping="Backends/LoopbackBackend/LoopbackLinkProvider.kt"];
+        LoopbackLink [shape=ellipse, label="Loopback Link", mapping="Backends/LoopbackBackend/LoopbackLink.kt"];
+
+        // Async
+        BackgroundJobHandler [shape=ellipse, label="Background Job Handler", mapping="async/BackgroundJobHandler.kt"];
+        BackgroundJob [shape=ellipse, label="Background Job", mapping="async/BackgroundJob.kt"];
+
+        // Device and DeviceInfo
+        Device [shape=ellipse, label="Device", mapping="Device.kt"];
+        DeviceInfo [shape=ellipse, label="DeviceInfo", mapping="DeviceInfo.kt"];
+
+        // Plugins
+        BatteryPlugin [shape=ellipse, label="Battery Plugin", mapping="Plugins/BatteryPlugin/BatteryPlugin.kt"];
+        ClipboardPlugin [shape=ellipse, label="Clipboard Plugin", mapping="Plugins/ClibpoardPlugin/ClipboardPlugin.java"];
+        ClipboardListener [shape=ellipse, label="Clipboard Listener", mapping="Plugins/ClibpoardPlugin/ClipboardListener.java"];
+        FindMyPhonePlugin [shape=ellipse, label="Find My Phone Plugin", mapping="Plugins/FindMyPhonePlugin/FindMyPhonePlugin.java"];
+        FindMyPhoneActivity [shape=ellipse, label="Find My Phone Activity", mapping="Plugins/FindMyPhonePlugin/FindMyPhoneActivity.java"];
+        FindMyPhoneReceiver [shape=ellipse, label="Find My Phone Receiver", mapping="Plugins/FindMyPhonePlugin/FindMyPhoneReceiver.java"];
+        MprisPlugin [shape=ellipse, label="MPRIS Plugin", mapping="Plugins/MprisPlugin/MprisPlugin.kt"];
+        MprisActivity [shape=ellipse, label="MPRIS Activity", mapping="Plugins/MprisPlugin/MprisActivity.kt"];
+        MprisMediaSession [shape=ellipse, label="MPRIS Media Session", mapping="Plugins/MprisPlugin/MprisMediaSession.kt"];
+        MprisMediaNotificationReceiver [shape=ellipse, label="MPRIS Media Notification Receiver", mapping="Plugins/MprisPlugin/MprisMediaNotificationReceiver.kt"];
+        MprisNowPlayingFragment [shape=ellipse, label="MPRIS Now Playing Fragment", mapping="Plugins/MprisPlugin/MprisNowPlayingFragment.kt"];
+        MprisReceiverPlugin [shape=ellipse, label="MPRIS Receiver Plugin", mapping="Plugins/MprisReceiverPlugin/MprisReceiverPlugin.java"];
+        MousePadPlugin [shape=ellipse, label="MousePad Plugin", mapping="Plugins/MousePadPlugin/MousePadPlugin.java"];
+        MousePadActivity [shape=ellipse, label="MousePad Activity", mapping="Plugins/MousePadPlugin/MousePadActivity.java"];
+        MouseReceiverPlugin [shape=ellipse, label="Mouse Receiver Plugin", mapping="Plugins/MouseReceiverPlugin/MouseReceiverPlugin.java"];
+        MouseReceiverService [shape=ellipse, label="Mouse Receiver Service", mapping="Plugins/MouseReceiverPlugin/MouseReceiverService.java"];
+        PresenterPlugin [shape=ellipse, label="Presenter Plugin", mapping="Plugins/PresenterPlugin/PresenterPlugin.java"];
+        PresenterActivity [shape=ellipse, label="Presenter Activity", mapping="Plugins/PresenterPlugin/PresenterActivity.kt"];
+        RemoteKeyboardPlugin [shape=ellipse, label="Remote Keyboard Plugin", mapping="Plugins/RemoteKeyboardPlugin/RemoteKeyboardPlugin.java"];
+        RemoteKeyboardService [shape=ellipse, label="Remote Keyboard Service", mapping="Plugins/RemoteKeyboardPlugin/RemoteKeyboardService.java"];
+        RunCommandPlugin [shape=ellipse, label="Run Command Plugin", mapping="Plugins/RunCommandPlugin/RunCommandPlugin.java"];
+        RunCommandActivity [shape=ellipse, label="Run Command Activity", mapping="Plugins/RunCommandPlugin/RunCommandActivity.java"];
+        RunCommandWidgetProvider [shape=ellipse, label="Run Command Widget Provider", mapping="Plugins/RunCommandPlugin/RunCommandWidgetProvider.kt"];
+        RunCommandWidgetConfigActivity [shape=ellipse, label="Run Command Widget Config Activity", mapping="Plugins/RunCommandPlugin/RunCommandWidgetConfigActivity.kt"];
+        RunCommandWidgetDataProvider [shape=ellipse, label="Run Command Widget Data Provider", mapping="Plugins/RunCommandPlugin/RunCommandWidgetDataProvider.kt"];
+        SMSPlugin [shape=ellipse, label="SMS Plugin", mapping="Plugins/SMSPlugin/SMSPlugin.kt"];
+        SharePlugin [shape=ellipse, label="Share Plugin", mapping="Plugins/SharePlugin/SharePlugin.java"];
+        ShareActivity [shape=ellipse, label="Share Activity", mapping="Plugins/SharePlugin/ShareActivity.java"];
+        ShareBroadcastReceiver [shape=ellipse, label="Share Broadcast Receiver", mapping="Plugins/SharePlugin/ShareBroadcastReceiver.java"];
+        SftpPlugin [shape=ellipse, label="SFTP Plugin", mapping="Plugins/SftpPlugin/SftpPlugin.kt"];
+        SftpSettingsFragment [shape=ellipse, label="SFTP Settings Fragment", mapping="Plugins/SftpPlugin/SftpSettingsFragment.java"];
+        SimpleSftpServer [shape=ellipse, label="Simple SFTP Server", mapping="Plugins/SftpPlugin/SimpleSftpServer.kt"];
+        SystemVolumePlugin [shape=ellipse, label="System Volume Plugin", mapping="Plugins/SystemVolumePlugin/SystemVolumePlugin.java"];
+        SystemVolumeFragment [shape=ellipse, label="System Volume Fragment", mapping="Plugins/SystemVolumePlugin/SystemVolumeFragment.kt"];
+        SystemVolumeProvider [shape=ellipse, label="System Volume Provider", mapping="Plugins/SystemVolumePlugin/SystemVolumeProvider.kt"];
+
+        // UI Components
+        AboutFragment [shape=ellipse, label="About Fragment", mapping="UserInterface/About/AboutFragment.kt"];
+        AboutData [shape=ellipse, label="About Data", mapping="UserInterface/About/AboutData.kt"];
+        AboutPerson [shape=ellipse, label="About Person", mapping="UserInterface/About/AboutPerson.kt"];
+        AboutPersonEntryItem [shape=ellipse, label="About Person Entry Item", mapping="UserInterface/About/AboutPersonEntryItem.kt"];
+        AboutKDEActivity [shape=ellipse, label="About KDE Activity", mapping="UserInterface/About/AboutKDEActivity.kt"];
+        LicensesActivity [shape=ellipse, label="Licenses Activity", mapping="UserInterface/About/LicensesActivity.kt"];
+        AdapterLinearLayout [shape=ellipse, label="Adapter Linear Layout", mapping="UserInterface/About/AdapterLinearLayout.kt"];
+        AutoGridLayout [shape=ellipse, label="Auto Grid Layout", mapping="UserInterface/About/AutoGridLayout.kt"];
+        EasterEggActivity [shape=ellipse, label="Easter Egg Activity", mapping="UserInterface/About/EasterEggActivity.kt"];
+
+        // Compose UI
+        KdeTheme [shape=ellipse, label="KDE Theme", mapping="UserInterface/compose/KdeTheme.kt"];
+        KdeTextButton [shape=ellipse, label="KDE Text Button", mapping="UserInterface/compose/Buttons.kt"];
+        KdeButton [shape=ellipse, label="KDE Button", mapping="UserInterface/compose/Buttons.kt"];
+        KdeTextField [shape=ellipse, label="KDE Text Field", mapping="UserInterface/compose/TextFields.kt"];
+        KdeTopAppBar [shape=ellipse, label="KDE Top App Bar", mapping="UserInterface/compose/KdeTopAppBar.kt"];
+
+        // List UI
+        ListAdapter [shape=ellipse, label="List Adapter", mapping="UserInterface/List/ListAdapter.kt"];
+        DeviceItem [shape=ellipse, label="Device Item", mapping="UserInterface/List/DeviceItem.kt"];
+        PairingDeviceItem [shape=ellipse, label="Pairing Device Item", mapping="UserInterface/List/PairingDeviceItem.kt"];
+        SectionItem [shape=ellipse, label="Section Item", mapping="UserInterface/List/SectionItem.kt"];
+        UnreachableDeviceItem [shape=ellipse, label="Unreachable Device Item", mapping="UserInterface/List/UnreachableDeviceItem.kt"];
+        EntryItem [shape=ellipse, label="Entry Item", mapping="UserInterface/List/EntryItem.kt"];
+
+        // UI Dialogs and Fragments
+        AlertDialogFragment [shape=ellipse, label="Alert Dialog Fragment", mapping="UserInterface/AlertDialogFragment.java"];
+        PermissionsAlertDialogFragment [shape=ellipse, label="Permissions Alert Dialog Fragment", mapping="UserInterface/PermissionsAlertDialogFragment.java"];
+        DeviceSettingsAlertDialogFragment [shape=ellipse, label="Device Settings Alert Dialog Fragment", mapping="UserInterface/DeviceSettingsAlertDialogFragment.java"];
+        EditTextAlertDialogFragment [shape=ellipse, label="Edit Text Alert Dialog Fragment", mapping="UserInterface/EditTextAlertDialogFragment.java"];
+        StartActivityAlertDialogFragment [shape=ellipse, label="Start Activity Alert Dialog Fragment", mapping="UserInterface/StartActivityAlertDialogFragment.kt"];
+
+        // Other UI Activities
+        PluginSettingsActivity [shape=ellipse, label="Plugin Settings Activity", mapping="UserInterface/PluginSettingsActivity.java"];
+        PluginSettingsFragment [shape=ellipse, label="Plugin Settings Fragment", mapping="UserInterface/PluginSettingsFragment.java"];
+        PluginSettingsListFragment [shape=ellipse, label="Plugin Settings List Fragment", mapping="UserInterface/PluginSettingsListFragment.java"];
+        CustomDevicesActivity [shape=ellipse, label="Custom Devices Activity", mapping="UserInterface/CustomDevicesActivity.java"];
+        TrustedNetworksActivity [shape=ellipse, label="Trusted Networks Activity", mapping="UserInterface/TrustedNetworksActivity.kt"];
+
+        // Helpers
+        DeviceHelper [shape=ellipse, label="Device Helper", mapping="Helpers/DeviceHelper.kt"];
+        NotificationHelper [shape=ellipse, label="Notification Helper", mapping="Helpers/NotificationHelper.java"];
+        ThreadHelper [shape=ellipse, label="Thread Helper", mapping="Helpers/ThreadHelper.kt"];
+        TrustedNetworkHelper [shape=ellipse, label="Trusted Network Helper", mapping="Helpers/TrustedNetworkHelper.kt"];
+        FilesHelper [shape=ellipse, label="Files Helper", mapping="Helpers/FilesHelper.kt"];
+        NetworkHelper [shape=ellipse, label="Network Helper", mapping="Helpers/NetworkHelper.kt"];
+        SmsMmsUtils [shape=ellipse, label="SmsMms Utils", mapping="Plugins/SMSPlugin/SmsMmsUtils.kt"];
+        ContactsHelper [shape=ellipse, label="Contacts Helper", mapping="Helpers/ContactsHelper.java"];
+        RandomHelper [shape=ellipse, label="Random Helper", mapping="Helpers/RandomHelper.kt"];
+        VolumeHelper [shape=ellipse, label="Volume Helper", mapping="Helpers/VolumeHelper.kt"];
+        WindowHelper [shape=ellipse, label="Window Helper", mapping="Helpers/WindowHelper.kt"];
+        IntentHelper [shape=ellipse, label="Intent Helper", mapping="Helpers/IntentHelper.java"];
+        LifecycleHelper [shape=ellipse, label="Lifecycle Helper", mapping="Helpers/LifecycleHelper.kt"];
+        MediaStoreHelper [shape=ellipse, label="Media Store Helper", mapping="Helpers/MediaStoreHelper.kt"];
+        SafeTextChecker [shape=ellipse, label="Safe Text Checker", mapping="Helpers/SafeTextChecker.kt"];
+        CollectionsBackport [shape=ellipse, label="Collections Backport", mapping="Helpers/CollectionsBackport.java"];
+        SecurityHelpers_SslHelper [shape=ellipse, label="SecurityHelpers.SslHelper", mapping="Helpers/SecurityHelpers/SslHelper.java"];
+        SecurityHelpers_RsaHelper [shape=ellipse, label="SecurityHelpers.RsaHelper", mapping="Helpers/SecurityHelpers/RsaHelper.kt"];
+        SecurityHelpers_ConstantTimeCompare [shape=ellipse, label="SecurityHelpers.ConstantTimeCompare", mapping="Helpers/SecurityHelpers/ConstantTimeCompare.kt"];
+
+        // Async
+        BackgroundJobHandler -> BackgroundJob [label="runs"];
+        BackgroundJobHandler -> BackgroundService [label="used by"];
+        BackgroundJob -> CompositeReceiveFileJob [label="subclass"];
+        BackgroundJob -> CompositeUploadFileJob [label="subclass"];
+
+        // Backends and Links
+        BluetoothLinkProvider -> BluetoothLink [label="creates"];
+        BluetoothLink -> ConnectionMultiplexer [label="uses"];
+        ConnectionMultiplexer -> BluetoothSocket [label="wraps"];
+        LanLinkProvider -> LanLink [label="creates"];
+        LanLink -> SSLSocket [label="wraps"];
+        LanLinkProvider -> MdnsDiscovery [label="uses"];
+        MdnsDiscovery -> LanLinkProvider [label="callback"];
+        LanLinkProvider -> DatagramSocket [label="uses"];
+        LanLinkProvider -> ServerSocket [label="uses"];
+        LoopbackLinkProvider -> LoopbackLink [label="creates"];
+
+        // Core app and backends
+        BackgroundService -> BaseLinkProvider [label="manages"];
+        BaseLinkProvider -> BaseLink [label="creates"];
+        BaseLinkProvider -> BluetoothLinkProvider [label="implements"];
+        BaseLinkProvider -> LanLinkProvider [label="implements"];
+        BaseLinkProvider -> LoopbackLinkProvider [label="implements"];
+        KdeConnect -> Device [label="manages"];
+        Device -> BaseLink [label="has"];
+        Device -> DeviceInfo [label="has"];
+        Device -> Plugin [label="has"];
+        DeviceInfo -> NetworkPacket [label="serializes to"];
+        DeviceInfo -> Certificate [label="has"];
+
+        // Plugins and Device
+        Plugin -> Device [label="belongs to"];
+        Plugin -> NetworkPacket [label="sends/receives"];
+        BatteryPlugin -> Plugin [label="extends"];
+        ClipboardPlugin -> Plugin [label="extends"];
+        FindMyPhonePlugin -> Plugin [label="extends"];
+        MprisPlugin -> Plugin [label="extends"];
+        MousePadPlugin -> Plugin [label="extends"];
+        MouseReceiverPlugin -> Plugin [label="extends"];
+        PresenterPlugin -> Plugin [label="extends"];
+        RemoteKeyboardPlugin -> Plugin [label="extends"];
+        RunCommandPlugin -> Plugin [label="extends"];
+        SMSPlugin -> Plugin [label="extends"];
+        SharePlugin -> Plugin [label="extends"];
+        SftpPlugin -> Plugin [label="extends"];
+        SystemVolumePlugin -> Plugin [label="extends"];
+        TelephonyPlugin -> Plugin [label="extends"];
+        NotificationsPlugin -> Plugin [label="extends"];
+        ReceiveNotificationsPlugin -> Plugin [label="extends"];
+
+        // Plugin UI
+        BatteryPlugin -> BackgroundService [label="uses"];
+        ClipboardPlugin -> ClipboardListener [label="uses"];
+        FindMyPhonePlugin -> FindMyPhoneActivity [label="starts"];
+        MprisPlugin -> MprisActivity [label="starts"];
+        MousePadPlugin -> MousePadActivity [label="starts"];
+        PresenterPlugin -> PresenterActivity [label="starts"];
+        RunCommandPlugin -> RunCommandActivity [label="starts"];
+        SharePlugin -> ShareActivity [label="starts"];
+        SystemVolumePlugin -> SystemVolumeFragment [label="starts"];
+        TelephonyPlugin -> BackgroundService [label="uses"];
+        NotificationsPlugin -> NotificationReceiver [label="uses"];
+
+        // UI and User
+        User -> MainActivity [label="interacts"];
+        MainActivity -> PairingFragment [label="shows"];
+        MainActivity -> DeviceFragment [label="shows"];
+        MainActivity -> SettingsFragment [label="shows"];
+        MainActivity -> CustomDevicesActivity [label="starts"];
+        MainActivity -> TrustedNetworksActivity [label="starts"];
+        MainActivity -> PluginSettingsActivity [label="starts"];
+        PairingFragment -> KdeConnect [label="observes"];
+        DeviceFragment -> Device [label="displays"];
+        SettingsFragment -> DeviceHelper [label="uses"];
+        SettingsFragment -> BackgroundService [label="uses"];
+        CustomDevicesActivity -> DeviceHost [label="manages"];
+        TrustedNetworksActivity -> TrustedNetworkHelper [label="uses"];
+
+        // Notifications and Clipboard
+        NotificationsPlugin -> NotificationReceiver [label="listens"];
+        ClipboardPlugin -> ClipboardListener [label="listens"];
+        ClipboardListener -> ClipboardFloatingActivity [label="starts"];
+
+        // SMS and Telephony
+        SMSPlugin -> SmsMmsUtils [label="uses"];
+        SMSPlugin -> TelephonyPlugin [label="related"];
+        TelephonyPlugin -> TelephonyManager [label="listens"];
+        TelephonyPlugin -> ContactsHelper [label="uses"];
+
+        // SFTP
+        SftpPlugin -> SimpleSftpServer [label="uses"];
+        SimpleSftpServer -> SafFileSystemFactory [label="uses"];
+        SafFileSystemFactory -> SafFileSystemProvider [label="provides"];
+        SafFileSystemProvider -> SafFileSystem [label="provides"];
+        SafFileSystem -> SafPath [label="provides"];
+        SafFileSystemProvider -> DocumentFile [label="uses"];
+
+        // Mpris Receiver
+        MprisReceiverPlugin -> MediaSessionManager [label="listens"];
+        MprisReceiverPlugin -> MprisReceiverPlayer [label="manages"];
+        MprisReceiverPlayer -> MediaController [label="wraps"];
+        MprisReceiverCallback -> MediaController.Callback [label="extends"];
+
+        // RunCommand Widget
+        RunCommandWidgetProvider -> RunCommandWidgetDataProvider [label="uses"];
+        RunCommandWidgetDataProvider -> RunCommandPlugin [label="uses"];
+
+        // Compose UI
+        DeviceFragment -> KdeTheme [label="uses"];
+        DeviceFragment -> PluginButtons [label="displays"];
+    }
+
+    // Data Stores
+    SharedPreferences [shape=cylinder, label="Shared Preferences"];
+    SQLiteDatabase [shape=cylinder, label="SQLite Database (AppDatabase)"];
+
+    // Data flows between components and data stores
+    SharedPreferences -> Device [label="device settings"];
+    SharedPreferences -> Plugin [label="plugin settings"];
+    SQLiteDatabase -> NotificationsPlugin [label="app database"];
+    NotificationsPlugin -> SQLiteDatabase [label="app database updates"];
+    Device -> SharedPreferences [label="save trusted devices"];
+    DeviceInfo -> SharedPreferences [label="save device info"];
+    PairingHandler -> DeviceInfo [label="uses"];
+    PairingHandler -> Device [label="manages pairing"];
+    BackgroundService -> SharedPreferences [label="read/write preferences"];
+    SettingsFragment -> SharedPreferences [label="read/write preferences"];
+    CustomDevicesActivity -> SharedPreferences [label="read/write custom devices"];
+    TrustedNetworksActivity -> SharedPreferences [label="read/write trusted networks"];
+    SharePlugin -> SharedPreferences [label="read/write unreachable URLs"];
+    SharePlugin -> BackgroundJobHandler [label="runs background jobs"];
+    CompositeReceiveFileJob -> ReceiveNotification [label="updates notification"];
+    CompositeUploadFileJob -> UploadNotification [label="updates notification"];
+    ClipboardListener -> ClipboardManager [label="access clipboard"];
+    NotificationsPlugin -> NotificationManager [label="post notifications"];
+    FindMyPhonePlugin -> NotificationManager [label="post notifications"];
+    MprisMediaSession -> NotificationManager [label="post notifications"];
+    MprisMediaNotificationReceiver -> NotificationManager [label="post notifications"];
+    RemoteKeyboardService -> InputMethodManager [label="input method"];
+    MouseReceiverService -> AccessibilityService [label="accessibility service"];
+    SMSPlugin -> ContentResolver [label="query SMS/MMS"];
+    ContactsPlugin -> ContactsHelper [label="query contacts"];
+    SftpPlugin -> StorageManager [label="query storage"];
+    SftpPlugin -> ContentResolver [label="access documents"];
+    SftpPlugin -> SQLiteDatabase [label="storage preferences"];
+    SystemVolumePlugin -> AudioManager [label="control volume"];
+    SystemVolumeProvider -> SystemVolumePlugin [label="listens sinks"];
+    SystemVolumeFragment -> SystemVolumePlugin [label="displays sinks"];
+    SystemVolumeFragment -> SystemVolumeProvider [label="volume key listener"];
+}
+```
+
+### Mapping of Entities to Source Files
+
+| Entity                          | Source File(s)                                                                                  |
+|--------------------------------|------------------------------------------------------------------------------------------------|
+| KdeConnect                     | KdeConnect.kt                                                                                   |
+| BackgroundService              | BackgroundService.kt                                                                            |
+| KdeConnectBroadcastReceiver   | KdeConnectBroadcastReceiver.kt                                                                 |
+| MainActivity                  | UserInterface/MainActivity.kt                                                                   |
+| PairingFragment              | UserInterface/PairingFragment.kt                                                                |
+| DeviceFragment               | UserInterface/DeviceFragment.kt                                                                 |
+| SettingsFragment             | UserInterface/SettingsFragment.kt                                                               |
+| CustomDevicesActivity        | UserInterface/CustomDevicesActivity.java                                                       |
+| TrustedNetworksActivity      | UserInterface/TrustedNetworksActivity.kt                                                       |
+| PluginSettingsActivity       | UserInterface/PluginSettingsActivity.java                                                      |
+| PluginSettingsListFragment   | UserInterface/PluginSettingsListFragment.java                                                  |
+| BluetoothLinkProvider        | Backends/BluetoothBackend/BluetoothLinkProvider.kt                                             |
+| BluetoothLink                | Backends/BluetoothBackend/BluetoothLink.kt                                                    |
+| ConnectionMultiplexer        | Backends/BluetoothBackend/ConnectionMultiplexer.kt                                            |
+| LanLinkProvider              | Backends/LanBackend/LanLinkProvider.java                                                      |
+| LanLink                      | Backends/LanBackend/LanLink.java                                                              |
+| MdnsDiscovery                | Backends/LanBackend/MdnsDiscovery.java                                                        |
+| NsdResolveQueue              | Backends/LanBackend/NsdResolveQueue.kt                                                        |
+| LoopbackLinkProvider         | Backends/LoopbackBackend/LoopbackLinkProvider.kt                                              |
+| LoopbackLink                 | Backends/LoopbackBackend/LoopbackLink.kt                                                     |
+| BackgroundJobHandler         | async/BackgroundJobHandler.kt                                                                 |
+| BackgroundJob                | async/BackgroundJob.kt                                                                        |
+| Device                      | Device.kt                                                                                     |
+| DeviceInfo                  | DeviceInfo.kt                                                                                 |
+| BatteryPlugin               | Plugins/BatteryPlugin/BatteryPlugin.kt                                                       |
+| ClipboardPlugin             | Plugins/ClibpoardPlugin/ClipboardPlugin.java                                                 |
+| ClipboardListener           | Plugins/ClibpoardPlugin/ClipboardListener.java                                               |
+| FindMyPhonePlugin           | Plugins/FindMyPhonePlugin/FindMyPhonePlugin.java                                             |
+| FindMyPhoneActivity         | Plugins/FindMyPhonePlugin/FindMyPhoneActivity.java                                           |
+| FindMyPhoneReceiver         | Plugins/FindMyPhonePlugin/FindMyPhoneReceiver.java                                           |
+| MprisPlugin                 | Plugins/MprisPlugin/MprisPlugin.kt                                                           |
+| MprisActivity               | Plugins/MprisPlugin/MprisActivity.kt                                                         |
+| MprisMediaSession           | Plugins/MprisPlugin/MprisMediaSession.kt                                                     |
+| MprisMediaNotificationReceiver | Plugins/MprisPlugin/MprisMediaNotificationReceiver.kt                                      |
+| MprisNowPlayingFragment     | Plugins/MprisPlugin/MprisNowPlayingFragment.kt                                               |
+| MprisReceiverPlugin         | Plugins/MprisReceiverPlugin/MprisReceiverPlugin.java                                         |
+| MousePadPlugin              | Plugins/MousePadPlugin/MousePadPlugin.java                                                   |
+| MousePadActivity            | Plugins/MousePadPlugin/MousePadActivity.java                                                 |
+| MouseReceiverPlugin         | Plugins/MouseReceiverPlugin/MouseReceiverPlugin.java                                         |
+| MouseReceiverService        | Plugins/MouseReceiverPlugin/MouseReceiverService.java                                        |
+| PresenterPlugin             | Plugins/PresenterPlugin/PresenterPlugin.java                                                 |
+| PresenterActivity           | Plugins/PresenterPlugin/PresenterActivity.kt                                                 |
+| RemoteKeyboardPlugin        | Plugins/RemoteKeyboardPlugin/RemoteKeyboardPlugin.java                                       |
+| RemoteKeyboardService       | Plugins/RemoteKeyboardPlugin/RemoteKeyboardService.java                                      |
+| RunCommandPlugin            | Plugins/RunCommandPlugin/RunCommandPlugin.java                                               |
+| RunCommandActivity          | Plugins/RunCommandPlugin/RunCommandActivity.java                                             |
+| RunCommandWidgetProvider    | Plugins/RunCommandPlugin/RunCommandWidgetProvider.kt                                         |
+| RunCommandWidgetConfigActivity | Plugins/RunCommandPlugin/RunCommandWidgetConfigActivity.kt                                 |
+| RunCommandWidgetDataProvider | Plugins/RunCommandPlugin/RunCommandWidgetDataProvider.kt                                    |
+| SMSPlugin                   | Plugins/SMSPlugin/SMSPlugin.kt                                                               |
+| SharePlugin                 | Plugins/SharePlugin/SharePlugin.java                                                         |
+| ShareActivity               | Plugins/SharePlugin/ShareActivity.java                                                       |
+| ShareBroadcastReceiver      | Plugins/SharePlugin/ShareBroadcastReceiver.java                                              |
+| SftpPlugin                  | Plugins/SftpPlugin/SftpPlugin.kt                                                             |
+| SftpSettingsFragment        | Plugins/SftpPlugin/SftpSettingsFragment.java                                                |
+| SimpleSftpServer            | Plugins/SftpPlugin/SimpleSftpServer.kt                                                      |
+| SystemVolumePlugin          | Plugins/SystemVolumePlugin/SystemVolumePlugin.java                                           |
+| SystemVolumeFragment        | Plugins/SystemVolumePlugin/SystemVolumeFragment.kt                                           |
+| SystemVolumeProvider        | Plugins/SystemVolumePlugin/SystemVolumeProvider.kt                                           |
+| AboutFragment               | UserInterface/About/AboutFragment.kt                                                        |
+| AboutData                   | UserInterface/About/AboutData.kt                                                            |
+| AboutPerson                 | UserInterface/About/AboutPerson.kt                                                          |
+| AboutPersonEntryItem        | UserInterface/About/AboutPersonEntryItem.kt                                                 |
+| AboutKDEActivity            | UserInterface/About/AboutKDEActivity.kt                                                     |
+| LicensesActivity            | UserInterface/About/LicensesActivity.kt                                                     |
+| AdapterLinearLayout         | UserInterface/About/AdapterLinearLayout.kt                                                  |
+| AutoGridLayout              | UserInterface/About/AutoGridLayout.kt                                                       |
+| EasterEggActivity           | UserInterface/About/EasterEggActivity.kt                                                    |
+| KdeTheme                   | UserInterface/compose/KdeTheme.kt                                                           |
+| KdeTextButton              | UserInterface/compose/Buttons.kt                                                            |
+| KdeButton                  | UserInterface/compose/Buttons.kt                                                            |
+| KdeTextField               | UserInterface/compose/TextFields.kt                                                         |
+| KdeTopAppBar               | UserInterface/compose/KdeTopAppBar.kt                                                       |
+| ListAdapter                | UserInterface/List/ListAdapter.kt                                                           |
+| DeviceItem                 | UserInterface/List/DeviceItem.kt                                                            |
+| PairingDeviceItem          | UserInterface/List/PairingDeviceItem.kt                                                     |
+| SectionItem                | UserInterface/List/SectionItem.kt                                                           |
+| UnreachableDeviceItem      | UserInterface/List/UnreachableDeviceItem.kt                                                 |
+| EntryItem                  | UserInterface/List/EntryItem.kt                                                             |
+| AlertDialogFragment        | UserInterface/AlertDialogFragment.java                                                      |
+| PermissionsAlertDialogFragment | UserInterface/PermissionsAlertDialogFragment.java                                         |
+| DeviceSettingsAlertDialogFragment | UserInterface/DeviceSettingsAlertDialogFragment.java                                    |
+| EditTextAlertDialogFragment | UserInterface/EditTextAlertDialogFragment.java                                             |
+| StartActivityAlertDialogFragment | UserInterface/StartActivityAlertDialogFragment.kt                                        |
+| PluginSettingsActivity     | UserInterface/PluginSettingsActivity.java                                                  |
+| PluginSettingsFragment     | UserInterface/PluginSettingsFragment.java                                                  |
+| PluginSettingsListFragment | UserInterface/PluginSettingsListFragment.java                                              |
+| CustomDevicesActivity      | UserInterface/CustomDevicesActivity.java                                                   |
+| TrustedNetworksActivity    | UserInterface/TrustedNetworksActivity.kt                                                   |
+| DeviceHelper               | Helpers/DeviceHelper.kt                                                                     |
+| NotificationHelper         | Helpers/NotificationHelper.java                                                            |
+| ThreadHelper               | Helpers/ThreadHelper.kt                                                                     |
+| TrustedNetworkHelper       | Helpers/TrustedNetworkHelper.kt                                                            |
+| FilesHelper                | Helpers/FilesHelper.kt                                                                      |
+| NetworkHelper              | Helpers/NetworkHelper.kt                                                                    |
+| SmsMmsUtils                | Plugins/SMSPlugin/SmsMmsUtils.kt                                                           |
+| ContactsHelper             | Helpers/ContactsHelper.java                                                                 |
+| RandomHelper               | Helpers/RandomHelper.kt                                                                     |
+| VolumeHelper               | Helpers/VolumeHelper.kt                                                                     |
+| WindowHelper               | Helpers/WindowHelper.kt                                                                     |
+| IntentHelper               | Helpers/IntentHelper.java                                                                   |
+| LifecycleHelper            | Helpers/LifecycleHelper.kt                                                                  |
+| MediaStoreHelper           | Helpers/MediaStoreHelper.kt                                                                 |
+| SafeTextChecker            | Helpers/SafeTextChecker.kt                                                                  |
+| CollectionsBackport        | Helpers/CollectionsBackport.java                                                           |
+| SecurityHelpers.SslHelper  | Helpers/SecurityHelpers/SslHelper.java                                                     |
+| SecurityHelpers.RsaHelper  | Helpers/SecurityHelpers/RsaHelper.kt                                                       |
+| SecurityHelpers.ConstantTimeCompare | Helpers/SecurityHelpers/ConstantTimeCompare.kt                                        |
+```
+
+===========================================================================================
+================ End apps =======================

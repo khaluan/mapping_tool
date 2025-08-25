@@ -1,0 +1,326 @@
+digraph threat_model {
+    User[shape=box, label="User"]
+    ExtDev[shape=box, label="External Device"]
+    Device[shape=ellipse, label="Device", mapping="org/kde/kdeconnect/Device.kt"]
+    SysBroad[shape=box, label="System Broadcast"]
+    
+    Pref[shape=cylinder, label="Shared preference", mapping="org/kde/kdeconnect/Backends/LanBackend/LanLinkProvider.java"]
+    PrefTrustedDev[shape=cylinder, label="Trusted device preference", mapping="org/kde/kdeconnect/Backends/LanBackend/LanLinkProvider.java"]
+    PrefDev[shape=cylinder, label="DeviceID preference", mapping="org/kde/kdeconnect/Backends/LanBackend/LanLinkProvider.java"]
+    
+    ////////////////////////////////////////////////////////////
+    BlueProv[shape=ellipse, label="BluetoothLinkProvider", mapping="org/kde/kdeconnect/Backends/BluetoothBackend/BluetoothLinkProvider.kt"]
+    
+    SysBroad -> BlueProv[label = "BluetoothDevice.ACTION_UUID"]
+    BlueProv -> Pref[label="KEY_BLUETOOTH_ENABLED"]
+    Pref -> BlueProv[label="KEY_BLUETOOTH_ENABLED"]
+    BlueProv -> ExtDev[label="NetworkPacket"]
+    ExtDev -> BlueProv[label="NetworkPacket"]
+    ////////////////////////////////////////////////////////////
+    
+    
+    ////////////////////////////////////////////////////////////
+    LanProv[shape=ellipse, label="Lan Link Provider", mapping="org/kde/kdeconnect/Backends/LanBackend/LanLinkProvider.java"]
+    NsdManager[shape=box, label="Android Nsd Manager", mapping="org/kde/kdeconnect/Backends/LanBackend/MdnsDiscovery.java"]
+    
+    PrefTrustedDev -> LanProv [label="deviceId_status"]
+    PrefDev -> LanProv[label="protocolVersion"]
+    LanProv -> ExtDev [label="NetworkPacket"]
+    ExtDev -> LanProv [label="NetworkPacket"]
+    
+    LanProv -> NsdManager[label="ServiceInfo"]
+    NsdManager -> LanProv[label="ServiceInfo"]
+    // ExtDev -> NsdManger[label="ServiceInfo"]
+    // NsdManager -> ExtDev[label="ServiceInfo"]
+    ////////////////////////////////////////////////////////////
+
+
+    ////////////////////////////////////////////////////////////
+    LoopbackProv[shape=ellipse, label = "Loopback Link Provider", mapping = "org/kde/kdeconnect/Backends/LoopbackBackend/LoopbackLink.kt"]
+    ////////////////////////////////////////////////////////////
+    
+    
+    ////////////////////////////////////////////////////////////
+    BatteryPlug[shape=ellipse, label="BatteryPlugin", mapping="org/kde/kdeconnect/Plugins/BatteryPlugin/BatteryPlugin.kt"]
+    SysBroad -> BatteryPlug[label="batteryInfo"]
+    BatteryPlug -> Device[label="PACKET_TYPE_BATTERY packet"]
+    ////////////////////////////////////////////////////////////
+    
+    
+    ////////////////////////////////////////////////////////////
+    BigscrPlug[shape=ellipse, label="BigscreenPlugin", mapping="org/kde/kdeconnect/Plugins/BigscreenPlugin/BigscreenPlugin.java"]
+    BigscrAct[shape=ellipse, label="BigscreenActivity", mapping="org/kde/kdeconnect/Plugins/BigscreenPlugin/BigscreenActivity.java"]
+    SpeechRecognizer[shape=box, label="Android Speech Recognizer", mapping="org/kde/kdeconnect/Plugins/BigscreenPlugin/BigscreenActivity.java"]
+    
+    SpeechRecognizer -> BigscrAct[label="text"]
+    BigscrAct -> BigscrPlug[label="text"]
+    BigscrPlug -> Device[label="PACKET_TYPE_BIGSCREEN_STT packet"]
+    BigscrPlug -> Device[label="PACKET_TYPE_MOUSEPAD_REQUEST packet"]
+    User -> BigscrAct[label="interaction"]
+    ////////////////////////////////////////////////////////////
+    
+    
+    ////////////////////////////////////////////////////////////
+    // Still looks weird
+    ClipPlug[shape=ellipse, label="ClipboardPlugin", mapping="org/kde/kdeconnect/Plugins/ClibpoardPlugin/ClipboardPlugin.java"]
+    ClipAct[shape=ellipse, label="ClipboardActivity", mapping="org/kde/kdeconnect/Plugins/ClibpoardPlugin/ClipboardFloatingActivity.java"]
+    ClipManager[shape=box, label="Android clipboard manager"]
+    ClipServ[shape=ellipse, label="ClipboardService", mapping="org/kde/kdeconnect/Plugins/ClibpoardPlugin/ClipboardTileService.kt"]
+    
+    Clipboard[shape=cylinder, label="Clipboard"]
+
+    User -> ClipServ[label="interaction"]
+    ClipServ -> ClipAct[label="Intent"]
+    
+    Clipboard -> ClipManager[label="text"]
+    ClipManager -> ClipPlug[label="text"]
+    ClipPlug -> Device[label="PACKET_TYPE_CLIPBOARD packet"]
+    ClipPlug -> Device[label="PACKET_TYPE_CLIPBOARD_CONNECT packet"]
+    ClipAct -> User[label="toast message"]
+    ////////////////////////////////////////////////////////////
+    
+    
+    ////////////////////////////////////////////////////////////
+    ConnectPlug[shape=ellipse, label="ConnectivityReportPlugin", mapping="org/kde/kdeconnect/Plugins/ConnectivityReportPlugin/ConnectivityReportPlugin.java"]
+    TelephonyManager[shape=box, label="Android telephony manager"]
+
+    TelephonyManager -> ConnectPlug[label="connectivity info"]
+    ConnectPlug -> Device[label="PACKET_TYPE_CONNECTIVITY_REPORT packet"]
+    ////////////////////////////////////////////////////////////    
+    
+    
+    ///////////////////////////////////////////////////////////
+    ContactPlug[shape=ellipse, label="Contact Plugin", mapping="org/kde/kdeconnect/Plugins/ContactsPlugin/ContactsPlugin.java"]
+    Contact[shape=cylinder, label="Contacts"]
+    Contact -> ContactPlug[label="Contact info"]
+    ContactPlug -> Device[label="PACKET_TYPE_CONTACTS_RESPONSE_UIDS_TIMESTAMPS"]
+    ContactPlug -> Device[label="PACKET_TYPE_CONTACTS_RESPONSE_VCARDS"]
+    Device -> ContactPlug[label="PACKET_TYPE_CONTACTS_REQUEST_ALL_UIDS_TIMESTAMPS"]
+    Device -> ContactPlug[label="PACKET_TYPE_CONTACTS_REQUEST_VCARDS_BY_UIDS"]
+    
+    ///////////////////////////////////////////////////////////
+
+    
+    ///////////////////////////////////////////////////////////
+    // Find my phone
+    FMPAct[shape=ellipse, label="FindMyPhoneActivity", mapping="org/kde/kdeconnect/Plugins/FindMyPhonePlugin/FindMyPhoneActivity.java"]
+    FMPPlug[shape=ellipse, label="FindMyPhonePlugin", mapping="org/kde/kdeconnect/Plugins/FindMyPhonePlugin/FindMyPhonePlugin.java"]
+    
+    Pref -> FMPPlug[label="findmyphone_ringtone"]
+    FMPPlug -> Pref[label="findmyphone_ringtone"]
+    FMPPlug -> FMPAct[label="Intent"]
+    FMPPlug -> Device[label=""]
+    ////////////////////////////////////////////////////////////
+    
+    
+    ///////////////////////////////////////////////////////////
+    // Find remote device
+    FRDPlug[shape=ellipse, label="Find Remote Device Plugin", mapping="org/kde/kdeconnect/Plugins/FindRemoteDevicePlugin/FindRemoteDevicePlugin.kt"]
+    
+    FRDPlug -> Device[label="PACKET_TYPE_FINDMYPHONE_REQUEST packet"]
+    ////////////////////////////////////////////////////////////
+    
+    
+    ////////////////////////////////////////////////////////////
+    // MousePadPlugin 
+    MPPlug[shape=ellipse, label="MousePadPlugin", mapping="org/kde/kdeconnect/Plugins/MousePadPlugin/MousePadPlugin.java"]
+    MPAct[shape=ellipse, label="MousePadActivity", mapping="org/kde/kdeconnect/Plugins/MousePadPlugin/MousePadActivity.java"]
+    ComposeSendAct[shape=ellipse, label="ComposeSendActivity", mapping="org/kde/kdeconnect/Plugins/MousePadPlugin/ComposeSendActivity.kt"]
+    Device -> MPPlug[label="PACKET_TYPE_MOUSEPAD_KEYBOARDSTATE"]
+    MPPlug -> Device[label="PACKET_TYPE_MOUSEPAD_REQUEST"]
+    User -> ComposeSendAct[label="interaction"]
+    ComposeSendAct -> MPPlug[label="command"]
+    User -> MPAct[label="interaction"]
+    MPAct -> MPPlug[label="command"]
+    
+    ////////////////////////////////////////////////////////////////
+    
+    
+    
+    ///////////////////////////////////////////////////////////////
+    // Mouse Receiver 
+    MouseRecvPlug[shape=ellipse, label="MouseReceiverPlugin", mapping="org/kde/kdeconnect/Plugins/MouseReceiverPlugin/MouseReceiverPlugin.java"]
+    Device -> MouseRecvPlug[label="PACKET_TYPE_MOUSEPAD_REQUEST"]
+     
+    /////////////////////////////////////////////////////////////
+    
+    
+    #################################################################
+    // MprisPlugin
+    MprisCache[shape=cylinder, label="AlbumArtCache", mapping="org/kde/kdeconnect/Plugins/MprisPlugin/AlbumArtCache.kt"]
+    MprisAct[shape=ellipse, label="MprisActivity", mapping="org/kde/kdeconnect/Plugins/MprisPlugin/MprisActivity.kt"]
+    MprisPlug[shape=ellipse, label="MprisPlugin", mapping="org/kde/kdeconnect/Plugins/MprisPlugin/MprisPlugin.kt"]
+    Pref -> MprisPlug[label="mpris_keepwatching_enabled"]
+    MprisPlug -> Device[label="PACKET_TYPE_MPRIS_REQUEST"]
+    Device -> MprisPlug[label="PACKET_TYPE_MPRIS"]
+    ##################################################################
+    
+    
+    #############################################################
+    // MprisReceiverPlugin
+    MprisRecvPlug[shape=ellipse, label="MprisReceiverPlugin", mapping="org/kde/kdeconnect/Plugins/MprisReceiverPlugin/MprisReceiverPlugin.java"]
+    MediaController[shape=box, label="Android MediaController"]
+    
+    MprisRecvPlug -> Device[label="PACKET_TYPE_MPRIS"]
+    Device -> MprisRecvPlug[label="PACKET_TYPE_MPRIS_REQUEST"]
+    MprisRecvPlug -> MediaController[label="Media Control"]
+    
+    #############################################################
+    // NotificationPlugin
+    AppDatabase[shape=cylinder, label="AppDatabase", mapping="org/kde/kdeconnect/Plugins/NotificationsPlugin/AppDatabase.java"]
+    SettingPref[shape=cylinder, label="SETTINGS_NAME"]
+    PackageManager[shape=box, label="Android Package Manager"]
+    NotiPlug[shape=ellipse, label="NotificationPlugin", mapping="org/kde/kdeconnect/Plugins/NotificationsPlugin/NotificationsPlugin.java"]
+    
+    SettingPref -> AppDatabase[label="SETTINGS_NAME"]
+    AppDatabase -> SettingPref[label="SETTINGS_KEY_ALL_ENABLED"]
+    PackageManager -> AppDatabase[label="ApplicationList"]
+    NotiManager -> NotiPlug[label="Notification"]
+    AppDatabase -> NotiPlug[label="Notification Filter"]
+    NotiPlug -> AppDatabase[label="Notification Filter"]
+    NotiPlug -> Device[label=""]
+    Device -> NotiPlug[label=""]
+
+    ################################################
+    // PingPlugin
+    PingPlug[shape=ellipse, label="PingPlugin", mapping="org/kde/kdeconnect/Plugins/PingPlugin/PingPlugin.kt"]
+    PingPlug -> Device[label="PACKET_TYPE_PING"]
+    Device -> PingPlug[label="PACKET_TYPE_PING"]
+
+    ################################################
+    // PresenterPlugin
+    PresentPlug[shape=ellipse, label="PresenterPlugin", mapping="org/kde/kdeconnect/Plugins/PresenterPlugin/PresenterPlugin.java"]
+    PresenterAct[shape=ellipse, label="PresenterActivity", mapping="org/kde/kdeconnect/Plugins/PresenterPlugin/PresenterActivity.kt"]
+    PresentPlug -> Device[label="PACKET_TYPE_MOUSEPAD_REQUEST, PACKET_TYPE_PRESENTER"]
+    User -> PresenterAct[label="interaction"]
+    PresenterAct -> PresentPlug[label="command"]
+
+    ##############################################################
+    // ReceiveNotiPlugin
+    NotiManager[shape=box, label="Android Notification Manager"]
+    RecvNotiPlug[shape=ellipse, label="ReceiveNotificationsPlugin", mapping="org/kde/kdeconnect/Plugins/ReceiveNotificationsPlugin/ReceiveNotificationsPlugin.java"]
+    RecvNotiPlug -> Device[label="PACKET_TYPE_NOTIFICATION_REQUEST"]
+    Device -> RecvNotiPlug[label="PACKET_TYPE_NOTIFICATION"]
+    RecvNotiPlug -> NotiManager[label="noti"]
+
+    ##################################################################
+    // RemoteKeyboardPlugin
+    RKeyPlug[shape=ellipse, label="RemoteKeyboardPlugin", mapping="org/kde/kdeconnect/Plugins/RemoteKeyboardPlugin/RemoteKeyboardPlugin.java"]
+    RKeyPlug -> Device[label="PACKET_TYPE_MOUSEPAD_ECHO, PACKET_TYPE_MOUSEPAD_KEYBOARDSTATE"]
+    Device -> RKeyPlug[label="PACKET_TYPE_MOUSEPAD_REQUEST"]
+    Pref -> RKeyPlug[label="remotekeyboard_editing_only"] 
+
+
+    ##################################################################
+    // RunCommandPlugin
+    RCPlug[shape=ellipse, label="RunCommandPlugin", mapping="org/kde/kdeconnect/Plugins/RunCommandPlugin.java"]
+    RCAct[shape=ellipse, label="RunCommandActivity", mapping="org/kde/kdeconnect/Plugins/RunCommandPlugin/RunCommandActivity.java"]
+    RCPlug -> Device[label="PACKET_TYPE_RUNCOMMAND_REQUEST"]
+    Device -> RCPlug[label="PACKET_TYPE_RUNCOMMAND"]
+    RCPlug -> Pref[label="commands_preference"]
+    User -> RCAct[label="interaction"]
+    RCAct -> RCPlug[label="command"]
+    
+
+    ##################################################################
+    // SftpPlugin
+    SftpPlug[shape=ellipse, label="SftpPlugin", mapping="org/kde/kdeconnect/Plugins/SftpPlugin/SftpPlugin.kt"]
+    SftpPlug -> Device[label="PACKET_TYPE_SFTP"]
+    Device -> SftpPlug[label="PACKET_TYPE_SFTP_REQUEST"]
+    SftpPlug -> FileStorage[label="file"]
+    FileStorage -> SftpPlug[label="file"]
+
+    ###############################################################
+    // Share Plugin
+    SharePlug[shape=ellipse, label="SharePlugin", mapping="org/kde/kdeconnect/Plugins/SharePlugin/SharePlugin.java"]
+    FileStorage[shape=box, label="Android File Storage"]
+    SendFileAct[shape=ellipse, label="SendFileActivity", mapping="org/kde/kdeconnect/Plugins/SharePlugin/SendFileActivity.java"]
+    ShareAct[shape=ellipse, label="ShareActivity", mapping="org/kde/kdeconnect/Plugins/SharePlugin/ShareActivity.java"]
+
+    SharePlug -> Device[label="PACKET_TYPE_SHARE_REQUEST"]
+    Device -> SharePlug[label="PACKET_TYPE_SHARE_REQUEST, PACKET_TYPE_SHARE_REQUEST_UPDATE"]
+    SharePlug -> ClipManager[label="text"]
+    SharePlug -> Pref[label="key_unreachable_url_list"]
+    FileStorage -> SharePlug[label="FileInfo"]
+    SharePlug -> FileStorage[label="FileInfo"]
+    SendFileAct -> SharePlug[label="file"]
+    User -> ShareAct[label="interaction"]
+    ShareAct -> SharePlug[label="command"]
+    
+    
+    ###################################################################
+    // SMSPlugin
+    SMSManager[shape=box, label="SMSManager"]
+    
+    SMSPlug[shape=ellipse, label="SMSPlugin", mapping="org/kde/kdeconnect/Plugins/SMSPlugin/SMSPlugin.java"]
+    SysBroad -> SMSPlug[label="SMS_RECEIVED_ACTION"]
+    Device -> SMSPlug[label="PACKET_TYPE_SMS_REQUEST, PACKET_TYPE_TELEPHONY_REQUEST, PACKET_TYPE_SMS_REQUEST_CONVERSATIONS, PACKET_TYPE_SMS_REQUEST_CONVERSATION, PACKET_TYPE_SMS_REQUEST_ATTACHMENT"]
+    SMSPlug -> Device[label="PACKET_TYPE_SMS_MESSAGE, PACKET_TYPE_SMS_ATTACHMENT_FILE"]
+    SMSPlug -> SMSManager[label="SMS"]
+    SMSManager -> SMSPlug[label="SMS"]
+    
+    #####################################################################
+    // SystemVolumePlugin
+    SysVolPlug[label="SystemVolumePlugin", shape=ellipse, mapping="org/kde/kdeconnect/Plugins/SystemVolumePlugin/SystemVolumePlugin.java"]
+    SysVolPlug -> Device[label="PACKET_TYPE_SYSTEMVOLUME"]
+    Device -> SysVolPlug[label="PACKET_TYPE_SYSTEMVOLUME_REQUEST"]
+
+    ###################################################################
+    // TelephonyPlugin
+    TelePlug[shape=ellipse, label="TelephonyPlugin", mapping="org/kde/kdeconnect/Plugins/TelephonyPlugin/TelephonyPlugin.java"]
+    SysBroad -> TelePlug[label="ACTION_PHONE_STATE_CHANGED"]
+    Contact -> TelePlug[label="contact_info"]
+    Device -> TelePlug[label="PACKET_TYPE_TELEPHONY_REQUEST, PACKET_TYPE_TELEPHONY_REQUEST_MUTE"]
+    TelePlug -> Device[label="PACKET_TYPE_TELEPHONY"]
+    TelephonyManager -> TelePlug[label="intent"]
+    Pref -> TelePlug[label ="telephony_blocked_numbers"]
+    #####################################################################
+    
+    
+
+    #########################################################################
+    KDEBroadRecv[shape=ellipse, label="KdeConnectBroadcastReceiver", mapping="org/kde/kdeconnect/KdeConnectBroadcastReceiver.kt"]
+    BgServ[shape=ellipse, label="BackgroundService", mapping="org/kde/kdeconnect/BackgroundService.kt"]
+
+    SysBroad -> KDEBroadRecv[label="ACTION_MY_PACKAGE_REPLACED, ACTION_BOOT_COMPLETED, WIFI_STATE_CHANGED_ACTION, ACTION_SCREEN_ON"]
+    KDEBroadRecv -> BgServ[label="context"]
+    BgServ -> LanProv[label="notify"]
+    BgServ -> BlueProv[label="notify"]
+    BgServ -> LoopbackProv[label="notify"]
+    
+    KdeApp[shape=ellipse, label="KdeConnect", mapping="org/kde/kdeconnect/KdeConnect.kt"]
+    PrefTrustedDev -> KdeApp[label="trusted_device"]
+
+    ThemePref[shape=cylinder, label="theme_pref", mapping="KdeConnect.kt"]
+    DeviceIDPref[shape=cylinder, label="Device ID Preference", mapping="org/kde/kdeconnect/Helpers/DeviceHelper.kt"]
+
+    ThemePref -> KdeApp[label="Application Theme"]
+    KdeApp -> DeviceIDPref[label="Device ID"]
+    DeviceIDPref -> KdeApp[label="Device ID"]
+    KdeApp -> Pref[label="publicKey, privateKey, certificate"]
+    Pref -> KdeApp[label="publicKey, privateKey, certificate"]
+    User -> KdeApp[label="interaction"]
+    
+
+    Device -> BlueProv[label="NetworkPacket"]
+    Device -> LanProv[label="NetworkPacket"]
+    Device -> LoopbackProv[label="NetworkPacket"]
+    Pref -> Device[label="publicKey, privateKey, certificate"]
+
+    subgraph cluster_os {
+        style=dashed;
+        SpeechRecognizer;
+        ClipManager
+        Clipboard;
+        Contact;
+        NsdManager; 
+        SysBroad;
+        SMSManager
+        MediaController
+        TelephonyManager
+        PackageManager
+        NotiManager
+        FileStorage
+    }
+    
+}
