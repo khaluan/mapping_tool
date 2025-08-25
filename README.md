@@ -42,3 +42,9 @@ CONSTRUCTED_FILE = rf'samples/zero-shot-log.txt' # LLM response file
 GROUND_TRUTH_FILE = rf'samples/benchmark.txt' # Ground truth file 
 filename = f"fscot-4.1-mini-new.py" # The tool output file
 ```
+
+
+After changing to the correct file, run
+```bash
+python eval.py
+```
